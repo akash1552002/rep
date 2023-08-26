@@ -1,10 +1,26 @@
 import { StyleSheet, Text, Button, TextInput, View } from "react-native";
 import React from "react";
-
-export default function Entry({ navigation }) {
-  const [text, onChangeText] = React.useState("");
-  const [number, onChangeNumber] = React.useState("");
-
+import { supabase } from "./supabase";
+export default function Entry() {
+  const [name, setname] = React.useState("");
+  const [phonenumber, setphonenumber] = React.useState();
+  const [address, setaddress] = React.useState("");
+  const [joindate, setjoindate] = React.useState();
+  // --
+  const [er, seter] = React.useState("");
+  const onAddStudent = async () => {
+    const { data, error } = await supabase.from("student").insert([
+      {
+        name: name,
+        phonenum: phonenumber,
+        address: address,
+        joindate: joindate,
+      },
+    ]);
+    seter(error ? error.message : "successful");
+    // .select();
+  };
+  // --
   return (
     <View style={styles.container}>
       {/* <View style={styles.inputSection}>
@@ -19,30 +35,31 @@ export default function Entry({ navigation }) {
       </View> */}
       <TextInput
         style={styles.input}
-        onChangeText={onChangeNumber}
-        value={number}
+        onChangeText={setname}
+        value={name}
         placeholder="Enter Name"
-        keyboardType="name"
+        keyboardType="default"
       />
 
       <TextInput
         style={styles.input}
-        onChangeText={onChangeNumber}
-        value={number}
+        onChangeText={setphonenumber}
+        value={phonenumber}
         placeholder="Enter Phone Number"
         keyboardType="numeric"
       />
+
       <TextInput
         style={styles.input}
-        onChangeText={onChangeNumber}
-        value={number}
+        onChangeText={setaddress}
+        value={address}
         placeholder="Enter Address"
         keyboardType="default"
       />
       <TextInput
         style={styles.input}
-        onChangeText={onChangeNumber}
-        value={number}
+        onChangeText={setjoindate}
+        value={joindate}
         placeholder="Enter Joining Date"
         keyboardType="numeric"
       />
@@ -51,9 +68,11 @@ export default function Entry({ navigation }) {
           style={styles.btn}
           title="Add Student"
           color="#2196F3"
-          accessibilityLabel="Learn more about this purple button"
+          onPress={onAddStudent}
+          // accessibilityLabel="Learn more about this purple button"
         />
       </View>
+      <Text>{er}</Text>
       {/* onPress={handleSignUp} */}
     </View>
   );

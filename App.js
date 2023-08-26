@@ -1,11 +1,11 @@
-import { StyleSheet, Button, Text, View } from "react-native";
+import { StyleSheet } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+// import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import HomePage from "./components/HomePage";
 import EntryPage from "./components/EntryPage";
 import AttendancePage from "./components/AttendancePage";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+// import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 // function Home() {
 //   return (
 //     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
@@ -28,9 +28,9 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 //     </View>
 //   );
 // }
-const Home = HomePage;
-const Entry = EntryPage;
-const Attendance = AttendancePage;
+// const Home = HomePage;
+// const Entry = EntryPage;
+// const Attendance = AttendancePage;
 // const Tab = createBottomTabNavigator();
 
 const Stack = createNativeStackNavigator();
@@ -40,15 +40,15 @@ export default function App() {
       <Stack.Navigator>
         <Stack.Screen
           name="Home"
-          component={Home}
-          options={{ title: "Home" }}
+          component={HomePage}
+          options={{ title: "HomePage" }}
         />
         <Stack.Screen
           name="Entry"
-          component={Entry}
+          component={EntryPage}
           options={{ title: "Entry" }}
         />
-        <Stack.Screen name="Attendance" component={Attendance} />
+        <Stack.Screen name="Attendance" component={AttendancePage} />
       </Stack.Navigator>
     </NavigationContainer>
     // <NavigationContainer>

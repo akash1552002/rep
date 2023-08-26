@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 
-export default function Attendance({navigation}) {
+export default function Attendance() {
   return (
     <View>
       <Text>Attendance</Text>
