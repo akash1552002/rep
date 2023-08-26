@@ -1,7 +1,6 @@
 import { StyleSheet } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-// import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import HomePage from "./components/HomePage";
 import EntryPage from "./components/EntryPage";
 import AttendancePage from "./components/AttendancePage";
