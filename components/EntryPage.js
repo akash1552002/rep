@@ -1,4 +1,12 @@
-import { StyleSheet, Text, Button, TextInput, View } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  Button,
+  TextInput,
+  SafeAreaView,
+  FlatList,
+  View,
+} from "react-native";
 import React from "react";
 import { supabase } from "./supabase";
 export default function Entry() {
@@ -9,20 +17,36 @@ export default function Entry() {
   // --
   const [er, seter] = React.useState("");
   const onAddStudent = async () => {
-    const { data, error } = await supabase.from("student").insert([
-      {
-        name: name,
-        phonenum: phonenumber,
-        address: address,
-        joindate: joindate,
-      },
-    ]);
+    const { data, error } = await supabase
+      .from("student")
+      .insert([
+        {
+          name: name,
+          phonenum: phonenumber,
+          address: address,
+          joindate: joindate,
+        },
+      ])
+      .select();
+
     seter(error ? error.message : "successful");
     // .select();
   };
+  const [students, setStudents] = React.useState([]);
+
+  const loader = async () => {
+    const { data, error } = await supabase.from("student").select("*");
+    setStudents(data);
+    seter(error);
+  };
+
+  React.useEffect(() => {
+    loader();
+  }, []);
   // --
   return (
     <View style={styles.container}>
+      {/* {console.log(students)} */}
       {/* <View style={styles.inputSection}>
         <Text>name</Text>
         <TextInput
@@ -72,7 +96,19 @@ export default function Entry() {
           // accessibilityLabel="Learn more about this purple button"
         />
       </View>
-      <Text>{er}</Text>
+      <Text style={styles.message}>Message: {er}</Text>
+      {/* <View style={[styles.list]}>
+        {students.map((x) => (
+          <Text key={x.name}>{x.name}</Text>
+        ))}
+      </View> */}
+      <SafeAreaView style={styles.message}>
+        <FlatList
+          data={students}
+          renderItem={({ item }) => <Text>{item.name}</Text>}
+          keyExtractor={(item) => item.name}
+        />
+      </SafeAreaView>
       {/* onPress={handleSignUp} */}
     </View>
   );
@@ -100,5 +136,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: "100%",
     borderRadius: 5,
+  },
+  message: {
+    margin: 12,
+    borderWidth: 1,
+    padding: 10,
+    borderRadius: 6,
   },
 });
