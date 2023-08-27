@@ -22,7 +22,6 @@ export default function Lister() {
   const [currentDate, setCurrentDate] = useState(getDate());
   const [std, setStd] = useState([]);
   const [error, setError] = useState(null);
-  const [count, setCount] = useState(std.length);
 
   const loadData = async () => {
     try {
