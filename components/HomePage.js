@@ -18,6 +18,9 @@ export default function Home({ navigation }) {
           onPress={() => navigation.navigate("Attendance")}
         />
       </View>
+      <View style={styles.container}>
+        <Button title="Record" onPress={() => navigation.navigate("Lister")} />
+      </View>
       {/* <Button
         title="Go to Entry"
         onPress={() => navigation.navigate("Entry")}

@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomePage from "./components/HomePage";
 import EntryPage from "./components/EntryPage";
 import AttendancePage from "./components/AttendancePage";
+import Lister from "./components/Lister";
 // import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 // function Home() {
 //   return (
@@ -48,6 +49,7 @@ export default function App() {
           options={{ title: "Entry" }}
         />
         <Stack.Screen name="Attendance" component={AttendancePage} />
+        <Stack.Screen name="Lister" component={Lister} />
       </Stack.Navigator>
     </NavigationContainer>
     // <NavigationContainer>

@@ -4,7 +4,6 @@
 // import { createNativeStackNavigator } from "@react-navigation/native-stack";
 // import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
-
 // function Home({ navigation }) {
 //   return (
 //     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
@@ -81,14 +80,14 @@ const Checkbox = ({ name }) => {
         .eq(name, getDate());
       seterr(error.message);
       console.log("no");
-      
     }
-    {console.log(err)}
+    {
+      console.log(err);
+    }
   };
 
   return (
     <View style={styles.checkcontainer}>
-      
       <TouchableOpacity
         onPress={handlePress}
         style={[styles.checkbox, isChecked && styles.checked]}

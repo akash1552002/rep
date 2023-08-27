@@ -56,7 +56,7 @@ const Checkbox = ({ name }) => {
   };
 
   return (
-    <View style={styles.checkcontainer}>
+    <View>
       <TouchableOpacity
         onPress={handlePress}
         style={[styles.checkbox, isChecked && styles.checked]}

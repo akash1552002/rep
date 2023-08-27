@@ -84,12 +84,11 @@ export default function Entry() {
         style={styles.input}
         onChangeText={setjoindate}
         value={joindate}
-        placeholder="Enter Joining Date"
+        placeholder="Enter Joining Date YYYY-MM-DD"
         keyboardType="numeric"
       />
       <View style={styles.buttonContainer}>
         <Button
-          style={styles.btn}
           title="Add Student"
           color="#2196F3"
           onPress={onAddStudent}
