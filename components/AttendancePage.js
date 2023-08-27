@@ -41,17 +41,14 @@ const Checkbox = ({ name }) => {
           .update({ presence: result })
           .eq("std_name", name)
           .eq("pdate", getDate());
-        console.log("no");
       } else {
-        const { data2, error2 } = await supabase
+        const { data, error } = await supabase
           .from("Attendance")
           .insert([{ std_name: name, presence: result, pdate: getDate() }])
           .select();
-        console.log("yes");
       }
     } catch (error) {
       console.error(error);
-      // Handle and display the error to the user
     }
   };
 
@@ -84,8 +81,7 @@ const Attendance = () => {
       setStudents(data);
       setError(error);
     } catch (error) {
-      console.error(error);
-      // Handle and display the error to the user
+      setError(error);
     }
   };
 
@@ -102,9 +98,10 @@ const Attendance = () => {
 
   return (
     <View>
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView>
         <View style={styles.dates}>
           <Text style={styles.datefont}>{currentDate}</Text>
+          <Text>message : {error}</Text>
         </View>
         <FlatList
           data={students}

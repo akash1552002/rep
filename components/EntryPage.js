@@ -7,15 +7,15 @@ import {
   FlatList,
   View,
 } from "react-native";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { supabase } from "./supabase";
 export default function Entry() {
-  const [name, setname] = React.useState("");
-  const [phonenumber, setphonenumber] = React.useState();
-  const [address, setaddress] = React.useState("");
-  const [joindate, setjoindate] = React.useState();
+  const [name, setname] = useState("");
+  const [phonenumber, setphonenumber] = useState();
+  const [address, setaddress] = useState("");
+  const [joindate, setjoindate] = useState();
   // --
-  const [er, seter] = React.useState("");
+  const [er, seter] = useState("");
   const onAddStudent = async () => {
     const { data, error } = await supabase
       .from("student")
@@ -30,9 +30,8 @@ export default function Entry() {
       .select();
 
     seter(error ? error.message : "successful");
-    // .select();
   };
-  const [students, setStudents] = React.useState([]);
+  const [students, setStudents] = useState([]);
 
   const loader = async () => {
     const { data, error } = await supabase.from("student").select("*");
@@ -40,23 +39,11 @@ export default function Entry() {
     seter(error);
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     loader();
   }, []);
-  // --
   return (
     <View style={styles.container}>
-      {/* {console.log(students)} */}
-      {/* <View style={styles.inputSection}>
-        <Text>name</Text>
-        <TextInput
-          style={styles.input}
-          onChangeText={onChangeNumber}
-          value={number}
-          placeholder="Enter Name"
-          keyboardType="name"
-        />
-      </View> */}
       <TextInput
         style={styles.input}
         onChangeText={setname}
@@ -88,19 +75,10 @@ export default function Entry() {
         keyboardType="numeric"
       />
       <View style={styles.buttonContainer}>
-        <Button
-          title="Add Student"
-          color="#2196F3"
-          onPress={onAddStudent}
-          // accessibilityLabel="Learn more about this purple button"
-        />
+        <Button title="Add Student" color="#2196F3" onPress={onAddStudent} />
       </View>
       <Text style={styles.message}>Message: {er}</Text>
-      {/* <View style={[styles.list]}>
-        {students.map((x) => (
-          <Text key={x.name}>{x.name}</Text>
-        ))}
-      </View> */}
+
       <SafeAreaView style={styles.message}>
         <FlatList
           data={students}
@@ -108,14 +86,12 @@ export default function Entry() {
           keyExtractor={(item) => item.name}
         />
       </SafeAreaView>
-      {/* onPress={handleSignUp} */}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    // backgroundColor: "#242526",
     height: "100%",
     width: "100%",
   },

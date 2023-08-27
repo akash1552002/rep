@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   SafeAreaView,
@@ -7,8 +8,8 @@ import {
   Button,
   View,
 } from "react-native";
-import React from "react";
 import { supabase } from "./supabase";
+
 export default function Lister() {
   const getDate = () => {
     const today = new Date();
@@ -18,48 +19,47 @@ export default function Lister() {
     return `${year}-${month}-${date}`;
   };
 
-  const [currentDate, setCurrentDate] = React.useState(getDate());
-  const [students, setStudents] = React.useState([]);
-  const [error, setError] = React.useState(null);
+  const [currentDate, setCurrentDate] = useState(getDate());
+  const [std, setStd] = useState([]);
+  const [error, setError] = useState(null);
+  const [count, setCount] = useState(std.length);
 
-  const loader = async () => {
+  const loadData = async () => {
     try {
-      const { data, error } = await supabase
+      let { data, error } = await supabase
         .from("Attendance")
         .select("*")
         .eq("pdate", currentDate);
-      console.log(data);
-      setStudents(data);
+      setStd(data);
       setError(error);
     } catch (error) {
-      console.log(error.message);
-      // Handle and display the error to the user
+      setError(error);
     }
   };
 
-  React.useEffect(() => {
-    loader();
+  useEffect(() => {
+    loadData();
   }, []);
 
   const Item = ({ title, presence }) => (
     <View style={styles.item}>
-      {console.log(title)}
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.attend}>{presence}</Text>
     </View>
   );
-  const findrecord = async () => {
+
+  const findRecord = async () => {
     const { data, error } = await supabase
       .from("Attendance")
       .select("*")
       .eq("pdate", currentDate);
-    setStudents(data);
+    setStd(data);
   };
+
   return (
-    <View>
-      <SafeAreaView>
+    <View style={styles.container}>
+      <SafeAreaView style={styles.safearea}>
         <View>
-          {/* <Text style={styles.datefont}>{currentDate}</Text> */}
           <TextInput
             style={styles.input}
             onChangeText={setCurrentDate}
@@ -71,13 +71,13 @@ export default function Lister() {
             <Button
               title="List Date Record"
               color="#2196F3"
-              onPress={findrecord}
-              // accessibilityLabel="Learn more about this purple button"
+              onPress={findRecord}
             />
           </View>
+          <Text>message: {error}</Text>
         </View>
         <FlatList
-          data={students}
+          data={std}
           renderItem={({ item }) => (
             <Item title={item.std_name} presence={item.presence} />
           )}
@@ -109,12 +109,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     width: "85%",
   },
-  dates: {
-    alignItems: "center",
-  },
-  datefont: {
-    fontSize: 20,
-  },
   buttonContainer: {
     alignItems: "center",
     justifyContent: "center",
@@ -125,5 +119,11 @@ const styles = StyleSheet.create({
     color: "#ffffff",
     backgroundColor: "#000000",
     padding: 5,
+  },
+  container: {
+    flex: 1,
+  },
+  safearea: {
+    flex: 1,
   },
 });
