@@ -34,7 +34,6 @@ const Checkbox = ({ name }) => {
         .select("*")
         .eq("pdate", getDate())
         .eq("std_name", name);
-      console.log(data.length);
       if (data.length === 1) {
         const { data, error } = await supabase
           .from("Attendance")
