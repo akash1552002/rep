@@ -29,21 +29,26 @@ const Checkbox = ({ name }) => {
     let result = !isChecked ? (result = "Present") : (result = "Absent");
 
     try {
-      // if (result === "Present") {
-      //   const { data, error } = await supabase
-      //     .from("Attendance")
-      //     .insert([{ std_name: name, presence: result, pdate: getDate() }])
-      //     .select();
-      //   console.log("yes");
-      //   setIsChecked(false);
-      // }
-      // else {
-      //   const { data, error } = await supabase
-      //     .from("Attendance")
-      //     .update({ presence: "Absent" })
-      //     .eq("std_name", name)
-      //     .eq("pdate", getDate());
-      // }
+      let { data, error } = await supabase
+        .from("Attendance")
+        .select("*")
+        .eq("pdate", getDate())
+        .eq("std_name", name);
+      console.log(data.length);
+      if (data.length === 1) {
+        const { data, error } = await supabase
+          .from("Attendance")
+          .update({ presence: result })
+          .eq("std_name", name)
+          .eq("pdate", getDate());
+        console.log("no");
+      } else {
+        const { data2, error2 } = await supabase
+          .from("Attendance")
+          .insert([{ std_name: name, presence: result, pdate: getDate() }])
+          .select();
+        console.log("yes");
+      }
     } catch (error) {
       console.error(error);
       // Handle and display the error to the user
