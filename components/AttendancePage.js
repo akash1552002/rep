@@ -18,7 +18,15 @@ const Checkbox = ({ name }) => {
       .eq("std_name", name)
       .eq("pdate", getDate());
     if (data.length > 0) {
-      setIsChecked(true);
+      if (data[0].presence === "Present") {
+        setIsChecked(true);
+      }
+    }
+    if (data.length === 0) {
+      const { data, error } = await supabase
+        .from("Attendance")
+        .insert([{ std_name: name, presence: "Absent", pdate: getDate() }])
+        .select();
     }
   };
   useEffect(() => {
