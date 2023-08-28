@@ -11,7 +11,19 @@ import { supabase } from "./supabase";
 
 const Checkbox = ({ name }) => {
   const [isChecked, setIsChecked] = useState(false);
-
+  const checkloader = async () => {
+    let { data, error } = await supabase
+      .from("Attendance")
+      .select("presence")
+      .eq("std_name", name)
+      .eq("pdate", getDate());
+    if (data.length > 0) {
+      setIsChecked(true);
+    }
+  };
+  useEffect(() => {
+    checkloader();
+  }, []);
   const getDate = () => {
     const today = new Date();
     const month = today.getMonth() + 1;
@@ -34,7 +46,7 @@ const Checkbox = ({ name }) => {
         .select("*")
         .eq("pdate", getDate())
         .eq("std_name", name);
-      if (data.length === 1) {
+      if (data.length > 0) {
         const { data, error } = await supabase
           .from("Attendance")
           .update({ presence: result })
@@ -96,23 +108,28 @@ const Attendance = () => {
   );
 
   return (
-    <View>
-      <SafeAreaView>
+    <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.safeview}>
         <View style={styles.dates}>
           <Text style={styles.datefont}>{currentDate}</Text>
           <Text>message : {error}</Text>
         </View>
+
         <FlatList
           data={students}
           renderItem={({ item }) => <Item title={item.name} />}
           keyExtractor={(item) => item.name}
         />
       </SafeAreaView>
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    height: "100%",
+    width: "100%",
+  },
   checkcontainer: {
     display: "flex",
     alignItems: "center",
@@ -143,6 +160,10 @@ const styles = StyleSheet.create({
   },
   datefont: {
     fontSize: 20,
+  },
+  safeview: {
+    flex: 1,
+    paddingBottom: 20,
   },
 });
 

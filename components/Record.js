@@ -56,7 +56,7 @@ export default function Lister() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <SafeAreaView style={styles.safearea}>
         <View>
           <TextInput
@@ -73,7 +73,7 @@ export default function Lister() {
               onPress={findRecord}
             />
           </View>
-          <Text>message: {error}</Text>
+          <Text style={styles.msg}>message: {error}</Text>
         </View>
         <FlatList
           data={std}
@@ -83,7 +83,7 @@ export default function Lister() {
           keyExtractor={(item) => item.id}
         />
       </SafeAreaView>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 18,
-    width: "85%",
+    width: "80%",
   },
   buttonContainer: {
     alignItems: "center",
@@ -118,11 +118,19 @@ const styles = StyleSheet.create({
     color: "#ffffff",
     backgroundColor: "#000000",
     padding: 5,
+    width: "auto",
+    justifyContent: "center",
+    alignItems: "center",
   },
   container: {
-    flex: 1,
+    height: "100%",
+    width: "100%",
   },
   safearea: {
     flex: 1,
+    paddingBottom: 20,
+  },
+  msg: {
+    marginLeft: "5%",
   },
 });

@@ -29,7 +29,8 @@ export default function Entry() {
       ])
       .select();
 
-    seter(error ? error.message : "successful");
+    seter(error ? error : "successful");
+    loader();
   };
   const [students, setStudents] = useState([]);
 
@@ -42,8 +43,28 @@ export default function Entry() {
   useEffect(() => {
     loader();
   }, []);
+
+  const Item = ({ title }) => (
+    <View style={styles.item}>
+      <Text style={styles.title}>{title}</Text>
+
+      <View style={styles.attend}>
+        <Button
+          title="Record"
+          onPress={async () => {
+            const { error } = await supabase
+              .from("student")
+              .delete()
+              .eq("name", title);
+            seter(error);
+            loader();
+          }}
+        />
+      </View>
+    </View>
+  );
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <TextInput
         style={styles.input}
         onChangeText={setname}
@@ -79,14 +100,14 @@ export default function Entry() {
       </View>
       <Text style={styles.message}>Message: {er}</Text>
 
-      <SafeAreaView style={styles.message}>
+      <SafeAreaView style={styles.safeview}>
         <FlatList
           data={students}
-          renderItem={({ item }) => <Text>{item.name}</Text>}
+          renderItem={({ item }) => <Item title={item.name} />}
           keyExtractor={(item) => item.name}
         />
       </SafeAreaView>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -117,5 +138,31 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 10,
     borderRadius: 6,
+  },
+  safeview: {
+    flex: 1,
+    paddingBottom: 20,
+  },
+  item: {
+    flexDirection: "row",
+    margin: 12,
+    borderWidth: 1,
+    padding: 10,
+    borderRadius: 6,
+    gap: 5,
+    alignItems: "center",
+  },
+  title: {
+    fontSize: 18,
+    width: "70%",
+  },
+  attend: {
+    color: "#ffffff",
+    // backgroundColor: "#ffffff",
+    padding: 5,
+    fontSize: 15,
+    width: "25%",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
