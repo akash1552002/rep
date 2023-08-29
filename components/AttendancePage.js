@@ -10,28 +10,6 @@ import {
 import { supabase } from "./supabase";
 
 const Checkbox = ({ name }) => {
-  const [isChecked, setIsChecked] = useState(false);
-  const checkloader = async () => {
-    let { data, error } = await supabase
-      .from("Attendance")
-      .select("presence")
-      .eq("std_name", name)
-      .eq("pdate", getDate());
-    if (data.length > 0) {
-      if (data[0].presence === "Present") {
-        setIsChecked(true);
-      }
-    }
-    if (data.length === 0) {
-      const { data, error } = await supabase
-        .from("Attendance")
-        .insert([{ std_name: name, presence: "Absent", pdate: getDate() }])
-        .select();
-    }
-  };
-  useEffect(() => {
-    checkloader();
-  }, []);
   const getDate = () => {
     const today = new Date();
     const month = today.getMonth() + 1;
@@ -39,6 +17,30 @@ const Checkbox = ({ name }) => {
     const date = today.getDate();
     return `${year}-${month}-${date}`;
   };
+  const [isChecked, setIsChecked] = useState(false);
+
+  const checkLoader = async () => {
+    const { data, error } = await supabase
+      .from("Attendance")
+      .select("*")
+      .eq("std_name", name)
+      .eq("pdate", getDate());
+
+    if (data.length > 0 && data[0].presence === "Present") {
+      setIsChecked(true);
+    }
+    //  else {
+    // if (data.id===data.id) {
+    //   const { data, error } = await supabase
+    //     .from("Attendance")
+    //     .insert([{ std_name: name, presence: "Absent", pdate: getDate() }])
+    //     .select();
+    // }
+    // }
+  };
+  useEffect(() => {
+    checkLoader();
+  }, []);
 
   const handlePress = () => {
     setIsChecked(!isChecked);
@@ -46,14 +48,15 @@ const Checkbox = ({ name }) => {
   };
 
   const deliver = async () => {
-    let result = !isChecked ? (result = "Present") : (result = "Absent");
+    const result = isChecked ? "Absent" : "Present";
 
     try {
-      let { data, error } = await supabase
+      const { data, error } = await supabase
         .from("Attendance")
         .select("*")
         .eq("pdate", getDate())
         .eq("std_name", name);
+
       if (data.length > 0) {
         const { data, error } = await supabase
           .from("Attendance")
@@ -63,7 +66,7 @@ const Checkbox = ({ name }) => {
       } else {
         const { data, error } = await supabase
           .from("Attendance")
-          .insert([{ std_name: name, presence: result, pdate: getDate() }])
+          .insert([{ std_name: name, presence: "Absent", pdate: getDate() }])
           .select();
       }
     } catch (error) {
@@ -98,7 +101,7 @@ const Attendance = () => {
     try {
       const { data, error } = await supabase.from("student").select("*");
       setStudents(data);
-      setError(error);
+      setError(error != null ? error.message : "successful");
     } catch (error) {
       setError(error);
     }
@@ -120,9 +123,8 @@ const Attendance = () => {
       <SafeAreaView style={styles.safeview}>
         <View style={styles.dates}>
           <Text style={styles.datefont}>{currentDate}</Text>
-          <Text>message : {error}</Text>
+          <Text>message: {error}</Text>
         </View>
-
         <FlatList
           data={students}
           renderItem={({ item }) => <Item title={item.name} />}
@@ -137,10 +139,6 @@ const styles = StyleSheet.create({
   container: {
     height: "100%",
     width: "100%",
-  },
-  checkcontainer: {
-    display: "flex",
-    alignItems: "center",
   },
   checkbox: {
     width: 40,

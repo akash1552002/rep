@@ -30,7 +30,7 @@ export default function Lister() {
         .select("*")
         .eq("pdate", currentDate);
       setStd(data);
-      setError(error);
+      setError(error != null ? error.message : "successful",loader());
     } catch (error) {
       setError(error);
     }

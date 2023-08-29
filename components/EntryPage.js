@@ -14,50 +14,44 @@ export default function Entry() {
   const [phonenumber, setphonenumber] = useState();
   const [address, setaddress] = useState("");
   const [joindate, setjoindate] = useState();
-  // --
-  const [er, seter] = useState("");
+  const [er, seter] = useState("no message");
+
   const onAddStudent = async () => {
     const { data, error } = await supabase
       .from("student")
       .insert([
         {
-          name: name,
+          name: name.slice(0, name.endsWith(" ") ? -1 : name.length),
           phonenum: phonenumber,
           address: address,
           joindate: joindate,
         },
       ])
       .select();
-
-    seter(error ? error : "successful");
-    loader();
+    seter(error != null ? error.message : "successful",loader());
   };
   const [students, setStudents] = useState([]);
 
   const loader = async () => {
     const { data, error } = await supabase.from("student").select("*");
     setStudents(data);
-    seter(error);
   };
 
   useEffect(() => {
     loader();
   }, []);
-
   const Item = ({ title }) => (
     <View style={styles.item}>
       <Text style={styles.title}>{title}</Text>
-
       <View style={styles.attend}>
         <Button
-          title="Record"
+          title="Remove"
           onPress={async () => {
             const { error } = await supabase
               .from("student")
               .delete()
               .eq("name", title);
-            seter(error);
-            loader();
+              seter(error != null ? error.message : "successful",loader());
           }}
         />
       </View>
@@ -158,7 +152,6 @@ const styles = StyleSheet.create({
   },
   attend: {
     color: "#ffffff",
-    // backgroundColor: "#ffffff",
     padding: 5,
     fontSize: 15,
     width: "25%",
