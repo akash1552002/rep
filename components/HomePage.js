@@ -1,6 +1,13 @@
 import { StyleSheet, Button, View } from "react-native";
 import React from "react";
+
 export default function Home({ navigation }) {
+  const styles = StyleSheet.create({
+    container: {
+      margin: 10,
+    },
+  });
+
   return (
     <View>
       <View style={styles.container}>
@@ -21,9 +28,3 @@ export default function Home({ navigation }) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    margin: 10,
-  },
-});

@@ -18,23 +18,30 @@ export default function Lister() {
     const date = today.getDate();
     return `${year}-${month}-${date}`;
   };
-
   const [currentDate, setCurrentDate] = useState(getDate());
-  const [std, setStd] = useState([]);
-  const [err, setError] = useState(null);
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const loadData = async () => {
-    // try {
-    let { data, error } = await supabase
-      .from("Attendance")
-      .select("*")
-      .eq("pdate", currentDate);
-    setStd(data);
-    setError(error != null ? error.message : "successful");
+    try {
+      setLoading(true);
+      setError(null);
 
-    // } catch (error) {
-    // setError(error);
-    // }
+      const { data, error } = await supabase
+        .from("Attendance")
+        .select("*")
+        .eq("pdate", currentDate);
+      if (error) {
+        setError(error.message);
+      } else {
+        setData(data);
+      }
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -49,11 +56,7 @@ export default function Lister() {
   );
 
   const findRecord = async () => {
-    const { data, error } = await supabase
-      .from("Attendance")
-      .select("*")
-      .eq("pdate", currentDate);
-    setStd(data);
+    loadData();
   };
 
   return (
@@ -74,10 +77,14 @@ export default function Lister() {
               onPress={findRecord}
             />
           </View>
-          <Text style={styles.msg}>message: {err}</Text>
+          {loading && <Text style={styles.msg}>Loading...</Text>}
+          {error && <Text style={styles.msg}>Error: {error}</Text>}
+          {!loading && !error && data.length === 0 && (
+            <Text style={styles.msg}>No records found</Text>
+          )}
         </View>
         <FlatList
-          data={std}
+          data={data}
           renderItem={({ item }) => (
             <Item title={item.std_name} presence={item.presence} />
           )}

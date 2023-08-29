@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -7,84 +8,106 @@ import {
   FlatList,
   View,
 } from "react-native";
-import React, { useState, useEffect } from "react";
 import { supabase } from "./supabase";
+
+const Item = ({ title, onDelete }) => (
+  <View style={styles.item}>
+    <Text style={styles.title}>{title}</Text>
+    <View style={styles.attend}>
+      <Button title="Remove" onPress={() => onDelete(title)} />
+    </View>
+  </View>
+);
+
 export default function Entry() {
-  const [name, setname] = useState("");
-  const [phonenumber, setphonenumber] = useState();
-  const [address, setaddress] = useState("");
-  const [joindate, setjoindate] = useState();
-  const [er, seter] = useState("no message");
+  const [name, setName] = useState("");
+  const [phonenumber, setPhoneNumber] = useState();
+  const [address, setAddress] = useState("");
+  const [joindate, setJoinDate] = useState("");
+  const [er, setEr] = useState("no message");
+  const [students, setStudents] = useState([]);
 
   const onAddStudent = async () => {
-    const { data, error } = await supabase
-      .from("student")
-      .insert([
+    try {
+      const { error } = await supabase.from("student").insert([
         {
           name: name.slice(0, name.endsWith(" ") ? -1 : name.length),
           phonenum: phonenumber,
           address: address,
           joindate: joindate,
         },
-      ])
-      .select();
-    seter(error != null ? error.message : "successful",loader());
+      ]);
+      if (error) {
+        setEr(error.message);
+      } else {
+        setEr("successful");
+        loader();
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
-  const [students, setStudents] = useState([]);
+
+  const onDeleteStudent = async (name) => {
+    try {
+      const { error } = await supabase
+        .from("student")
+        .delete()
+        .eq("name", name);
+      if (error) {
+        setEr(error.message);
+      } else {
+        setEr("successful");
+        loader();
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const loader = async () => {
-    const { data, error } = await supabase.from("student").select("*");
-    setStudents(data);
+    try {
+      const { data, error } = await supabase.from("student").select("*");
+      if (error) {
+        console.error(error);
+      } else {
+        setStudents(data);
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   useEffect(() => {
     loader();
   }, []);
-  const Item = ({ title }) => (
-    <View style={styles.item}>
-      <Text style={styles.title}>{title}</Text>
-      <View style={styles.attend}>
-        <Button
-          title="Remove"
-          onPress={async () => {
-            const { error } = await supabase
-              .from("student")
-              .delete()
-              .eq("name", title);
-              seter(error != null ? error.message : "successful",loader());
-          }}
-        />
-      </View>
-    </View>
-  );
+
   return (
     <SafeAreaView style={styles.container}>
       <TextInput
         style={styles.input}
-        onChangeText={setname}
+        onChangeText={setName}
         value={name}
         placeholder="Enter Name"
         keyboardType="default"
       />
-
       <TextInput
         style={styles.input}
-        onChangeText={setphonenumber}
+        onChangeText={setPhoneNumber}
         value={phonenumber}
         placeholder="Enter Phone Number"
         keyboardType="numeric"
       />
-
       <TextInput
         style={styles.input}
-        onChangeText={setaddress}
+        onChangeText={setAddress}
         value={address}
         placeholder="Enter Address"
         keyboardType="default"
       />
       <TextInput
         style={styles.input}
-        onChangeText={setjoindate}
+        onChangeText={setJoinDate}
         value={joindate}
         placeholder="Enter Joining Date YYYY-MM-DD"
         keyboardType="numeric"
@@ -93,12 +116,13 @@ export default function Entry() {
         <Button title="Add Student" color="#2196F3" onPress={onAddStudent} />
       </View>
       <Text style={styles.message}>Message: {er}</Text>
-
       <SafeAreaView style={styles.safeview}>
         <FlatList
           data={students}
-          renderItem={({ item }) => <Item title={item.name} />}
-          keyExtractor={(item) => item.name}
+          renderItem={({ item }) => (
+            <Item title={item.name} onDelete={onDeleteStudent} />
+          )}
+          keyExtractor={(item) => item.id.toString()} // Assuming there is an "id" property
         />
       </SafeAreaView>
     </SafeAreaView>
