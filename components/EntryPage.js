@@ -122,7 +122,7 @@ export default function Entry() {
           renderItem={({ item }) => (
             <Item title={item.name} onDelete={onDeleteStudent} />
           )}
-          keyExtractor={(item) => item.id.toString()} // Assuming there is an "id" property
+          keyExtractor={(item) => item.id.toString()}
         />
       </SafeAreaView>
     </SafeAreaView>
