@@ -106,11 +106,28 @@ const Attendance = () => {
       setError(error);
     }
   };
-
+  const checkabsent = async () => {
+    student.forEach(myfunc);
+  };
+  const myfunc = async (elem) => {
+    const { data } = await supabase
+      .from("Attendance")
+      .select("presence")
+      .eq("std_name", elem.name)
+      .eq("pdate", getDate());
+    if (data && data.length < 1) {
+      const { data, error } = await supabase
+        .from("Attendance")
+        .insert([{ std_name: elem.name, pdate: getDate(), presence: "Absent" }])
+        .select();
+    }
+  };
   useEffect(() => {
     loader();
   }, []);
-
+  useEffect(() => {
+    checkabsent();
+  }, [student]);
   const Item = ({ title }) => (
     <View style={styles.item}>
       <Text style={styles.title}>{title}</Text>
@@ -128,7 +145,7 @@ const Attendance = () => {
         <FlatList
           data={student}
           renderItem={({ item }) => <Item title={item.name} />}
-          keyExtractor={(item) => item.name}
+          keyExtractor={(item) => item.id}
         />
       </SafeAreaView>
     </SafeAreaView>
