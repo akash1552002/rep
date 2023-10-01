@@ -18,6 +18,7 @@ export default function Lister() {
     const date = today.getDate();
     return `${year}-${month}-${date}`;
   };
+
   const [currentDate, setCurrentDate] = useState(getDate());
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -28,10 +29,16 @@ export default function Lister() {
       setLoading(true);
       setError(null);
 
+      // Input validation for currentDate
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(currentDate)) {
+        throw new Error("Invalid date format");
+      }
+
       const { data, error } = await supabase
         .from("Attendance")
         .select("*")
         .eq("pdate", currentDate);
+
       if (error) {
         setError(error.message);
       } else {
@@ -55,10 +62,6 @@ export default function Lister() {
     </View>
   );
 
-  const findRecord = async () => {
-    loadData();
-  };
-
   return (
     <SafeAreaView style={styles.container}>
       <SafeAreaView style={styles.safearea}>
@@ -74,7 +77,7 @@ export default function Lister() {
             <Button
               title="List Date Record"
               color="#2196F3"
-              onPress={findRecord}
+              onPress={loadData}
             />
           </View>
           {loading && <Text style={styles.msg}>Loading...</Text>}

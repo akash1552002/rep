@@ -9,7 +9,6 @@ import {
   View,
 } from "react-native";
 import { supabase } from "./supabase";
-
 const Item = ({ title, onDelete }) => (
   <View style={styles.item}>
     <Text style={styles.title}>{title}</Text>
@@ -18,10 +17,9 @@ const Item = ({ title, onDelete }) => (
     </View>
   </View>
 );
-
 export default function Entry() {
   const [name, setName] = useState("");
-  const [phonenumber, setPhoneNumber] = useState();
+  const [phonenumber, setPhoneNumber] = useState("");
   const [address, setAddress] = useState("");
   const [joindate, setJoinDate] = useState("");
   const [er, setEr] = useState("no message");
@@ -31,20 +29,21 @@ export default function Entry() {
     try {
       const { error } = await supabase.from("student").insert([
         {
-          name: name.slice(0, name.endsWith(" ") ? -1 : name.length),
+          name: name.trim(),
           phonenum: phonenumber,
           address: address,
           joindate: joindate,
         },
       ]);
       if (error) {
-        setEr(error.message);
+        setEr("An error occurred while adding the student.");
       } else {
-        setEr("successful");
+        setEr("Student added successfully.");
         loader();
       }
     } catch (error) {
       console.error(error);
+      setEr("An error occurred while adding the student.");
     }
   };
 
@@ -55,26 +54,31 @@ export default function Entry() {
         .delete()
         .eq("name", name);
       if (error) {
-        setEr(error.message);
+        setEr("An error occurred while deleting the student.");
       } else {
-        setEr("successful");
+        setEr("Student deleted successfully.");
         loader();
       }
     } catch (error) {
       console.error(error);
+      setEr("An error occurred while deleting the student.");
     }
   };
 
   const loader = async () => {
     try {
-      const { data, error } = await supabase.from("student").select("*");
+      const { data, error } = await supabase
+        .from("student")
+        .select("name, phonenum, address, joindate,id");
       if (error) {
         console.error(error);
+        setEr("An error occurred while loading students.");
       } else {
         setStudents(data);
       }
     } catch (error) {
       console.error(error);
+      setEr("An error occurred while loading students.");
     }
   };
 
@@ -122,13 +126,12 @@ export default function Entry() {
           renderItem={({ item }) => (
             <Item title={item.name} onDelete={onDeleteStudent} />
           )}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item) => item.id}
         />
       </SafeAreaView>
     </SafeAreaView>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     height: "100%",
