@@ -5,18 +5,24 @@ import { NavigationContainer } from "@react-navigation/native";
 import Home from './src/screen/Home';
 import About from './src/screen/About';
 import RecipeDetail from './src/components/RecipeDetail';
-// import Login from './src/screen/Login';
+import SignupScreen from './src//screen/Signup'
+import Login from './src/screen/Login';
+import Profile from './src/components/Profile';
 // import Detail from './src/Detail';
 
+
 const Stack = createNativeStackNavigator();
+
 export default function App() {
   return (
     <NavigationContainer>
-        <Stack.Navigator>
+        <Stack.Navigator >
           <Stack.Screen name='home' component={Home} options={{headerShown:false}}/>
-          <Stack.Screen name='about' component={About} options={{headerShown:false}}/>
+          <Stack.Screen name='About' component={About} options={{headerShown:false}}/>
           <Stack.Screen name='RecipeDetail' component={RecipeDetail}/>
-          {/* <Stack.Screen name='Login' component={Login} options={{headerShown:false}}/> */}
+          <Stack.Screen name='Login' component={Login} options={{headerShown:false}}/>
+          <Stack.Screen name='Signup' component={SignupScreen} options={{headerShown:false}}/>
+          <Stack.Screen name="Profile" component={Profile} options={{headerShown:false}}/>
         </Stack.Navigator>
     </NavigationContainer>
   );

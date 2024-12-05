@@ -1,22 +1,33 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { StyleSheet, View, Text, TextInput, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { BellIcon, UserCircleIcon } from "react-native-heroicons/outline";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
+import { StatusBar } from "expo-status-bar";
 import Catagories from "../components/Catagories";
 import Recipe from "../components/Recipe";
-import { StatusBar } from "expo-status-bar";
+import { useRoute,useNavigation } from "@react-navigation/native";  // Import the useRoute hook
 
-const About = (navigation ) => {
+const About = () => {
+  const navigation = useNavigation();
+  const route = useRoute();  // Access the route prop using the useRoute hook
+  const { userName } = route.params || {};  // Destructure the params object (safely)
+
   const [selectedCategory, setSelectedCategory] = useState("");
+
+  useEffect(() => {
+    if (!userName) {
+      console.log("No user name provided");
+    }
+  }, [userName]);
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar style="black"/>
+      <StatusBar style="black" />
       {/* Top Header Section */}
       <View style={styles.header}>
         {/* Profile Section */}
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate("Profile", { userName })}>
           <UserCircleIcon size={hp("6%")} color="#000" />
         </TouchableOpacity>
 
@@ -28,7 +39,9 @@ const About = (navigation ) => {
 
       {/* Greeting Section */}
       <View style={styles.greeting}>
-        <Text style={styles.helloText}>Hello, Name</Text>
+        {/* Wrapping the string inside the <Text> component */}
+        {/* //|| "user" */}
+        <Text style={styles.helloText}>Hello, {userName }</Text>
         <Text style={styles.subtitleText}>
           Make your own food, stay at home
         </Text>

@@ -1,5 +1,5 @@
-import { StyleSheet, View, Image ,Text} from "react-native";
-import React from 'react'
+import { StyleSheet, View, Image, Text } from "react-native";
+import React, { useEffect, useState } from 'react'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { StatusBar } from "expo-status-bar";
 import Animated, {
@@ -9,64 +9,77 @@ import Animated, {
   withRepeat,
 } from 'react-native-reanimated';
 import { useNavigation } from "@react-navigation/native";
-import About from "./About";
+import { auth } from "../../firebaseConfig"; // Make sure you have the firebase config
 
 const Home = ({ navigation }) => {
-
-  // const navigation = useNavigation(); // Use navigation hook
+  const [isLoggedIn, setIsLoggedIn] = useState(null); // State to track the login status
 
   // Shared values for animation
   const outerScale = useSharedValue(1);
   const middleScale = useSharedValue(1);
 
+  // Firebase listener to check if the user is logged in
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged(user => {
+      if (user) {
+        setIsLoggedIn(true); // If user is logged in, update the state
+      } else {
+        setIsLoggedIn(false); // If no user, update the state
+      }
+    });
+
+    return unsubscribe; // Cleanup listener
+  }, []);
+
   // Animate rings
-  React.useEffect(() => {
+  useEffect(() => {
     // Start animation
     outerScale.value = withRepeat(withTiming(1.2, { duration: 1000 }), -1, true); // Pulsing animation
     middleScale.value = withRepeat(withTiming(1.1, { duration: 1000 }), -1, true);
 
-    // Stop animation after 3 seconds and navigate
+    // Stop animation after 4 seconds and navigate based on login status
     const timer = setTimeout(() => {
-      navigation.navigate("about"); // Replace 'NextPage' with your target screen name
+      if (isLoggedIn) {
+        navigation.navigate("About"); // Navigate to About if user is logged in
+      } else {
+        navigation.navigate("Login"); // Navigate to Login if user is not logged in
+      }
     }, 4000);
 
     return () => clearTimeout(timer); // Cleanup timer
-  }, []);
+  }, [isLoggedIn]);
 
-  // Animated styles
+  // Animated styles for the rings
   const outerRingStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: outerScale.value }],
+    transform: [{ scale: outerScale.value }], // Apply scale transformation
   }));
 
   const middleRingStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: middleScale.value }],
+    transform: [{ scale: middleScale.value }], // Apply scale transformation
   }));
 
   return (
-
     <View style={styles.container}>
-      <StatusBar style="light"/>
-    {/* Animated Outer Ring */}
-    <Animated.View style={[styles.outerRing, outerRingStyle]}>
-      {/* Animated Middle Ring */}
-      <Animated.View style={[styles.middleRing, middleRingStyle]}>
-        {/* Center Image */}
-        <Image
-          source={{ uri: "https://via.placeholder.com/150" }} // Replace with your image URL
-          style={styles.image}
-        />
+      <StatusBar style="light" />
+      
+      {/* Animated Outer Ring */}
+      <Animated.View style={[styles.outerRing, outerRingStyle]}>
+        {/* Animated Middle Ring */}
+        <Animated.View style={[styles.middleRing, middleRingStyle]}>
+          {/* Center Image */}
+          <Image
+            source={{ uri: "https://via.placeholder.com/150" }} // Replace with your image URL
+            style={styles.image}
+          />
+        </Animated.View>
       </Animated.View>
-    </Animated.View>
 
-    {/* Text Section */}
-    <Text style={styles.title}>Foody</Text>
-    <Text style={styles.subtitle}>Food is always right</Text>
-  </View>
-);
-}
-
-  
-
+      {/* Text Section */}
+      <Text style={styles.title}>Foody</Text>
+      <Text style={styles.subtitle}>Food is always right</Text>
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -111,4 +124,5 @@ const styles = StyleSheet.create({
     fontStyle: "italic", // Italic style for the tagline
   },
 });
-export default Home
+
+export default Home;

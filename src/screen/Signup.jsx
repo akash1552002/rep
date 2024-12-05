@@ -1,21 +1,25 @@
 import React, { useState } from "react";
 import { View, TextInput, Button, StyleSheet, Text, Alert } from "react-native";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from "../../firebaseConfig";
 
-export default function LoginScreen({ navigation }) {
+export default function SignupScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [username, setUsername] = useState(""); // New state for username
 
-  const handleLogin = async () => {
+  const handleSignup = async () => {
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      Alert.alert("Success", "Logged in successfully!");
+      // Update user profile with username
+      await updateProfile(user, {
+        displayName: username,
+      });
 
-      // Navigate to About screen and pass the userName
-      navigation.navigate("About", { userName: "Akash" });
+      Alert.alert("Success", "Account created!");
+      navigation.navigate("Login");
     } catch (error) {
       Alert.alert("Error", error.message);
     }
@@ -23,6 +27,12 @@ export default function LoginScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
+      <TextInput
+        style={styles.input}
+        placeholder="Username"
+        value={username}
+        onChangeText={setUsername}
+      />
       <TextInput
         style={styles.input}
         placeholder="Email"
@@ -38,12 +48,12 @@ export default function LoginScreen({ navigation }) {
         onChangeText={setPassword}
         secureTextEntry
       />
-      <Button title="Log In" onPress={handleLogin} />
+      <Button title="Sign Up" onPress={handleSignup} />
       <Text
         style={styles.link}
-        onPress={() => navigation.navigate("Signup")}
+        onPress={() => navigation.navigate("Login")}
       >
-        Don't have an account? Sign up
+        Already have an account? Log in
       </Text>
     </View>
   );
