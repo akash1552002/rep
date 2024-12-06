@@ -9,6 +9,7 @@ import SignupScreen from './src//screen/Signup'
 import Login from './src/screen/Login';
 import Profile from './src/components/Profile';
 import Recipe from './src/components/Recipe';
+import Loader from './src/components/Loader';
 // import Detail from './src/Detail';
 
 
@@ -25,6 +26,7 @@ export default function App() {
           <Stack.Screen name='Signup' component={SignupScreen} options={{headerShown:false}}/>
           <Stack.Screen name="Profile" component={Profile} options={{headerShown:false}}/>
           <Stack.Screen name='Recipe' component={Recipe} options={{headerShown:false}}/>
+          <Stack.Screen name="Loader" component={Loader} options={{headerShown:false}}/>
         </Stack.Navigator>
     </NavigationContainer>
   );
