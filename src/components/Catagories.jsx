@@ -15,9 +15,15 @@ const Catagories = ({ selectedCategory, setSelectedCategory }) => {
       const response = await axios.get(
         "https://www.themealdb.com/api/json/v1/1/categories.php"
       );
-      setCategories(response.data.categories);
-      if (response.data.categories.length > 0) {
-        setSelectedCategory(response.data.categories[0].strCategory); // Set default category
+
+      // Filter out the category "Beef"
+      const filteredCategories = response.data.categories.filter(
+        (category) => category.strCategory !== "Beef"
+      );
+
+      setCategories(filteredCategories);
+      if (filteredCategories.length > 0) {
+        setSelectedCategory(filteredCategories[0].strCategory); // Set default category
       }
     } catch (error) {
       console.error("Error fetching categories:", error);

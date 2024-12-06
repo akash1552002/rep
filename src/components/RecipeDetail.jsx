@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View, Image, ScrollView, Linking, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, View, Image, ScrollView, Linking, TouchableOpacity, SafeAreaView } from "react-native";
 import axios from "axios";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
 
@@ -38,6 +38,14 @@ const RecipeDetail = ({ route, navigation }) => {
     return ingredients;
   };
 
+  const renderInstructions = (instructions) => {
+    return instructions.split("\r\n").map((step, index) => (
+      <View key={index} style={styles.instructionStep}>
+        <Text style={styles.instructionStepText}>{`${index + 1}. ${step}`}</Text>
+      </View>
+    ));
+  };
+
   if (!recipeDetail) {
     return (
       <View style={styles.loadingContainer}>
@@ -47,7 +55,7 @@ const RecipeDetail = ({ route, navigation }) => {
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollView}>
         <Image
           source={{ uri: recipeDetail.strMealThumb }}
@@ -66,7 +74,9 @@ const RecipeDetail = ({ route, navigation }) => {
           ))}
 
           <Text style={styles.sectionTitle}>Instructions</Text>
-          <Text style={styles.instructionText}>{recipeDetail.strInstructions}</Text>
+          <View style={styles.instructionsContainer}>
+            {renderInstructions(recipeDetail.strInstructions)}
+          </View>
 
           {recipeDetail.strYoutube && (
             <TouchableOpacity
@@ -78,7 +88,7 @@ const RecipeDetail = ({ route, navigation }) => {
           )}
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -86,8 +96,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: wp("5%"),
-    marginBottom:hp("3%"),
-
+    marginTop:hp("5%"),
+    marginBottom: hp("3%"),
     backgroundColor: "#fff",
   },
   loadingContainer: {
@@ -98,48 +108,78 @@ const styles = StyleSheet.create({
   recipeImage: {
     width: "100%",
     height: hp("40%"),
-    borderRadius: wp("2%"),
+    borderRadius: wp("3%"),
+    borderWidth: 2,
+    borderColor: "#ddd", // Adds a subtle border to the image
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
   },
   recipeTitle: {
-    fontSize: wp("6%"),
+    fontSize: wp("6.5%"),
     fontWeight: "bold",
     marginTop: hp("2%"),
     textAlign: "center",
+    color: "#333",
+    textTransform: "capitalize",
   },
   detailsContainer: {
     marginTop: hp("3%"),
   },
   subtitle: {
-    fontSize: wp("4%"),
+    fontSize: wp("4.2%"),
     color: "#555",
-    marginVertical: hp("1%"),
+    marginVertical: hp("1.5%"),
+    fontWeight: "500",
   },
   sectionTitle: {
     fontSize: wp("5%"),
     fontWeight: "bold",
     marginTop: hp("2%"),
+    color: "#FF6347", // A fresh color to highlight sections
   },
   ingredientText: {
-    fontSize: wp("4%"),
+    fontSize: wp("4.2%"),
     color: "#333",
-    marginVertical: hp("0.5%"),
+    marginVertical: hp("0.7%"),
+    lineHeight: 22,
+    fontWeight: "400",
   },
-  instructionText: {
-    fontSize: wp("4%"),
-    color: "#333",
+  instructionsContainer: {
+    marginTop: hp("1.5%"),
+  },
+  instructionStep: {
     marginVertical: hp("1%"),
+    padding: wp("2%"),
+    backgroundColor: "#f8f8f8",
+    borderRadius: wp("2%"),
+    shadowColor: "#ddd",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
+  instructionStepText: {
+    fontSize: wp("4.2%"),
+    color: "#333",
+    lineHeight: 24,
   },
   videoLink: {
-    marginTop: hp("2%"),
-    backgroundColor: "#FF6347",
-    paddingVertical: hp("1%"),
-    borderRadius: wp("2%"),
+    marginTop: hp("3%"),
+    backgroundColor: "#FF6347", // Tomato color
+    paddingVertical: hp("1.5%"),
+    borderRadius: wp("3%"),
     alignItems: "center",
+    shadowColor: "#FF6347",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
   },
   videoLinkText: {
     color: "#fff",
-    fontSize: wp("4%"),
+    fontSize: wp("4.5%"),
     fontWeight: "bold",
+    textTransform: "uppercase",
   },
   scrollView: {
     flexGrow: 1,

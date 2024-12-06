@@ -8,6 +8,7 @@ import RecipeDetail from './src/components/RecipeDetail';
 import SignupScreen from './src//screen/Signup'
 import Login from './src/screen/Login';
 import Profile from './src/components/Profile';
+import Recipe from './src/components/Recipe';
 // import Detail from './src/Detail';
 
 
@@ -19,10 +20,11 @@ export default function App() {
         <Stack.Navigator >
           <Stack.Screen name='home' component={Home} options={{headerShown:false}}/>
           <Stack.Screen name='About' component={About} options={{headerShown:false}}/>
-          <Stack.Screen name='RecipeDetail' component={RecipeDetail}/>
+          <Stack.Screen name='RecipeDetail' component={RecipeDetail} options={{headerShown:false}}/>
           <Stack.Screen name='Login' component={Login} options={{headerShown:false}}/>
           <Stack.Screen name='Signup' component={SignupScreen} options={{headerShown:false}}/>
           <Stack.Screen name="Profile" component={Profile} options={{headerShown:false}}/>
+          <Stack.Screen name='Recipe' component={Recipe} options={{headerShown:false}}/>
         </Stack.Navigator>
     </NavigationContainer>
   );

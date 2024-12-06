@@ -2,10 +2,14 @@ import React, { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, Image, StyleSheet, Alert } from "react-native";
 import * as ImagePicker from "expo-image-picker"; // Import expo-image-picker
 import { CameraIcon } from "react-native-heroicons/solid"; // Import camera icon from heroicons
+import { signOut } from "firebase/auth"; // Import signOut from Firebase Auth
+import { auth } from "../../firebaseConfig"; // Adjust path to your Firebase config
+import { useNavigation } from "@react-navigation/native"; // Import navigation hook
 
 const Profile = ({ route }) => {
   const { userName } = route.params || {}; // Get the userName passed via navigation
-  
+  const navigation = useNavigation(); // Initialize navigation hook
+
   const [image, setImage] = useState(null); // State to store the selected image
 
   // Request permission for media library and camera on component mount
@@ -21,16 +25,44 @@ const Profile = ({ route }) => {
   }, []);
 
   // Function to open the image picker
-  const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images, // Only allow images
-      allowsEditing: true, // Allow cropping of the image
-      aspect: [4, 4], // Set the aspect ratio to square
-      quality: 1, // High quality image
-    });
+//   const pickImage = async () => {
+//     let result = await ImagePicker.launchImageLibraryAsync({
+//       mediaTypes: ImagePicker.MediaTypeOptions.Images, // Only allow images
+//       allowsEditing: true, // Allow cropping of the image
+//       aspect: [4, 4], // Set the aspect ratio to square
+//       quality: 1, // High quality image
+//     });
 
-    if (!result.canceled) {
-      setImage(result.assets[0].uri); // Set the selected image URI to state
+//     if (!result.canceled) {
+//       setImage(result.assets[0].uri); // Set the selected image URI to state
+//     }
+//   };
+const pickImage = async () => {
+  let result = await ImagePicker.launchImageLibraryAsync({
+    mediaTypes: ImagePicker.MediaTypeOptions.Images, // Only allow images
+    allowsEditing: true, // Allow cropping of the image
+    aspect: [4, 4], // Set the aspect ratio to square
+    quality: 1, // High quality image
+  });
+
+  if (!result.canceled) {
+    const selectedImageUri = result.assets[0].uri;
+    setImage(selectedImageUri); // Set the selected image URI to state
+
+    // Update the About screen with the new profile image
+    navigation.setParams({ profileImage: selectedImageUri });
+  }
+};
+
+
+  // Function to handle logout
+  const handleLogout = async () => {
+    try {
+      await signOut(auth); // Sign out the user
+      Alert.alert("Logout Successful", "You have been logged out.");
+      navigation.replace("Login"); // Navigate to Login screen
+    } catch (error) {
+      Alert.alert("Logout Failed", error.message);
     }
   };
 
@@ -53,7 +85,12 @@ const Profile = ({ route }) => {
         <Text style={styles.imagePickerText}>Choose Image</Text>
       </TouchableOpacity>
 
-      <Text style={styles.userName}>Username: {userName || 'Guest'}</Text>
+      <Text style={styles.userName}>Username: {userName || "Guest"}</Text>
+
+      {/* Logout Button */}
+      <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
+        <Text style={styles.logoutButtonText}>Logout</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -100,6 +137,19 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 18,
     color: "#555",
+    marginTop: 20,
+  },
+  logoutButton: {
+    marginTop: 30,
+    backgroundColor: "#FF5C5C",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+  },
+  logoutButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
 
