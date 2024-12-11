@@ -1,13 +1,24 @@
-import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
+import React, { useEffect, useState, memo } from "react";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
 import MasonryList from "@react-native-seoul/masonry-list";
 import axios from "axios";
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 import { useNavigation } from "@react-navigation/native";
 
 const Recipe = ({ selectedCategory }) => {
   const navigation = useNavigation();
   const [recipes, setRecipes] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (selectedCategory) {
@@ -17,24 +28,47 @@ const Recipe = ({ selectedCategory }) => {
 
   const fetchRecipes = async () => {
     try {
+      setLoading(true);
       const response = await axios.get(
         `https://www.themealdb.com/api/json/v1/1/filter.php?c=${selectedCategory}`
       );
       setRecipes(response.data.meals || []);
     } catch (error) {
       console.error("Error fetching recipes:", error);
+      alert("Failed to fetch recipes. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const renderRecipe = ({ item }) => (
+  const RecipeCard = memo(({ recipe }) => (
     <TouchableOpacity
       style={styles.recipeCard}
-      onPress={() => navigation.navigate("RecipeDetail", { recipeId: item.idMeal })}
+      onPress={() => navigation.navigate("RecipeDetail", { recipeId: recipe.idMeal })}
     >
-      <Image source={{ uri: item.strMealThumb }} style={styles.recipeImage} />
-      <Text style={styles.recipeText}>{item.strMeal}</Text>
+      <Image source={{ uri: recipe.strMealThumb }} style={styles.recipeImage} />
+      <Text style={styles.recipeText}>{recipe.strMeal}</Text>
     </TouchableOpacity>
-  );
+  ));
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#FF6347" />
+        <Text style={styles.loadingText}>Loading recipes...</Text>
+      </View>
+    );
+  }
+
+  if (!recipes.length) {
+    return (
+      <View style={styles.emptyContainer}>
+        <Text style={styles.emptyText}>
+          No recipes available for {selectedCategory}.
+        </Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -42,7 +76,7 @@ const Recipe = ({ selectedCategory }) => {
       <MasonryList
         data={recipes}
         keyExtractor={(item) => item.idMeal}
-        renderItem={renderRecipe}
+        renderItem={({ item }) => <RecipeCard recipe={item} />}
         numColumns={2}
         contentContainerStyle={styles.masonryContent}
         showsVerticalScrollIndicator={false}
@@ -53,19 +87,16 @@ const Recipe = ({ selectedCategory }) => {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     marginTop: hp("2%"),
     paddingHorizontal: wp("3%"),
-    flex: 1,
   },
   title: {
     fontSize: wp("6%"),
     fontWeight: "bold",
     color: "#2e2e2e",
     marginBottom: hp("2%"),
-    // marginLeft:wp('0%'),
     textAlign: "center",
-    // marginLeft:hp("-1%"),
-    
   },
   masonryContent: {
     paddingBottom: hp("5%"),
@@ -75,22 +106,42 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFF",
     borderRadius: wp("4%"),
     overflow: "hidden",
-    elevation: 8,
+    elevation: 5,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
-    shadowRadius: 10,
+    shadowRadius: 8,
   },
   recipeImage: {
     width: "100%",
     height: hp("20%"),
-    borderRadius: wp("4%"),
   },
   recipeText: {
     padding: wp("3%"),
     fontSize: wp("4.5%"),
     color: "#333",
     fontWeight: "500",
+    textAlign: "center",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingText: {
+    marginTop: hp("2%"),
+    fontSize: wp("4%"),
+    color: "#555",
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  emptyText: {
+    fontSize: wp("4.5%"),
+    color: "#FF6347",
+    fontWeight: "bold",
     textAlign: "center",
   },
 });

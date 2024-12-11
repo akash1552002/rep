@@ -9,35 +9,51 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  ActivityIndicator,
 } from "react-native";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from "../../firebaseConfig";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
 
-export default function SignupScreen({ navigation }) {
+const SignupScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState(""); // New state for username
+  const [loading, setLoading] = useState(false); // Loading state
 
+  // Handle signup logic
   const handleSignup = async () => {
+    if (!email || !password || !username) {
+      Alert.alert("Validation Error", "All fields are required.");
+      return;
+    }
+
+    setLoading(true); // Show loading spinner
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-  
+
       // Update user profile with username
       await updateProfile(user, {
         displayName: username,
       });
-  
-      Alert.alert("Success", "Account created!");
-  
-      // Pass the username to the About component
+
+      Alert.alert("Success", "Account created successfully!");
+
+      // Navigate to About screen with the username
       navigation.navigate("About", { userName: username });
     } catch (error) {
-      Alert.alert("Error", error.message);
+      setLoading(false); // Hide loading spinner
+      if (error.code === "auth/email-already-in-use") {
+        Alert.alert("Error", "This email is already in use. Please try another.");
+      } else {
+        Alert.alert("Error", error.message);
+      }
+    } finally {
+      setLoading(false); // Hide loading spinner
     }
   };
-  
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -72,8 +88,16 @@ export default function SignupScreen({ navigation }) {
           placeholderTextColor="#aaa"
         />
 
-        <TouchableOpacity style={styles.button} onPress={handleSignup}>
-          <Text style={styles.buttonText}>Sign Up</Text>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={handleSignup}
+          disabled={loading} // Disable button while loading
+        >
+          {loading ? (
+            <ActivityIndicator size="small" color="#FFF" />
+          ) : (
+            <Text style={styles.buttonText}>Sign Up</Text>
+          )}
         </TouchableOpacity>
 
         <Text style={styles.link}>
@@ -88,7 +112,7 @@ export default function SignupScreen({ navigation }) {
       </ScrollView>
     </KeyboardAvoidingView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -129,7 +153,7 @@ const styles = StyleSheet.create({
     borderRadius: wp("2%"),
     width: wp("90%"),
     alignItems: "center",
-    marginTop: hp("1%"),
+    marginTop: hp("2%"),
   },
   buttonText: {
     color: "#FFF",
@@ -146,3 +170,5 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
+
+export default SignupScreen;

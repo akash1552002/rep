@@ -1,30 +1,34 @@
 import React, { useState } from "react";
-import { View, TextInput, Button, StyleSheet, Text, Alert } from "react-native";
+import { View, TextInput, Button, StyleSheet, Text, Alert, ActivityIndicator } from "react-native";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../firebaseConfig";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen"; // Import responsive screen
 import { CommonActions } from "@react-navigation/native";
 
-export default function LoginScreen({ navigation }) {
+const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false); // Loading state
 
   const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert("Validation Error", "Please enter both email and password.");
+      return;
+    }
+
+    setLoading(true); // Show loading indicator
+
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-  
+
       // Use the user's displayName or fallback to the default "Akash"
       const userName = user.displayName || "Akash";
-  
-       Alert.alert("Success", "Logged in successfully!");
-  
-    //   // Pass the username to the About component
-    //   navigation.navigate("About", { userName });
-    // } catch (error) {
-    //   Alert.alert("Error", error.message);
-    // }
-    navigation.dispatch(
+
+      Alert.alert("Success", "Logged in successfully!");
+
+      // Reset navigation stack to About screen after login
+      navigation.dispatch(
         CommonActions.reset({
           index: 0,
           routes: [{ name: "About", params: { userName } }],
@@ -32,6 +36,8 @@ export default function LoginScreen({ navigation }) {
       );
     } catch (error) {
       Alert.alert("Error", error.message);
+    } finally {
+      setLoading(false); // Hide loading indicator
     }
   };
 
@@ -44,6 +50,7 @@ export default function LoginScreen({ navigation }) {
         onChangeText={setEmail}
         keyboardType="email-address"
         autoCapitalize="none"
+        autoCompleteType="email"
       />
       <TextInput
         style={styles.input}
@@ -51,8 +58,14 @@ export default function LoginScreen({ navigation }) {
         value={password}
         onChangeText={setPassword}
         secureTextEntry
+        autoCompleteType="password"
       />
-      <Button title="Log In" onPress={handleLogin} />
+      
+      <Button title={loading ? "Logging In..." : "Log In"} onPress={handleLogin} disabled={loading} />
+
+      {/* Show loader when logging in */}
+      {loading && <ActivityIndicator size="large" color="#FF6347" style={styles.loader} />}
+      
       <Text
         style={styles.link}
         onPress={() => navigation.navigate("Signup")}
@@ -61,27 +74,33 @@ export default function LoginScreen({ navigation }) {
       </Text>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
-    paddingHorizontal: wp("5%"), // Use responsive padding
+    paddingHorizontal: wp("5%"),
     backgroundColor: "#F9F9F9",
   },
   input: {
     borderWidth: 1,
-    padding: wp("3%"), // Adjust padding to be responsive
-    marginVertical: hp("2%"), // Adjust margin to be responsive
+    padding: wp("3%"),
+    marginVertical: hp("2%"),
     borderRadius: 5,
     borderColor: "#ccc",
-    fontSize: wp("4%"), // Responsive font size
+    fontSize: wp("4%"),
+    backgroundColor: "#FFF", // Added background color for the input
+  },
+  loader: {
+    marginTop: hp("2%"),
   },
   link: {
-    marginTop: hp("3%"), // Adjust margin to be responsive
+    marginTop: hp("3%"),
     color: "blue",
     textAlign: "center",
-    fontSize: wp("4%"), // Responsive font size for link
+    fontSize: wp("4%"),
   },
 });
+
+export default LoginScreen;

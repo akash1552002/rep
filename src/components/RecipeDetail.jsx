@@ -1,11 +1,23 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View, Image, ScrollView, Linking, TouchableOpacity, SafeAreaView } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  ScrollView,
+  Linking,
+  TouchableOpacity,
+  SafeAreaView,
+  ActivityIndicator,
+  Alert,
+} from "react-native";
 import axios from "axios";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
 
-const RecipeDetail = ({ route, navigation }) => {
+const RecipeDetail = ({ route }) => {
   const { recipeId } = route.params;
   const [recipeDetail, setRecipeDetail] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (recipeId) {
@@ -21,6 +33,9 @@ const RecipeDetail = ({ route, navigation }) => {
       setRecipeDetail(response.data.meals[0]);
     } catch (error) {
       console.error("Error fetching recipe detail:", error);
+      Alert.alert("Error", "Failed to fetch recipe details. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -39,17 +54,26 @@ const RecipeDetail = ({ route, navigation }) => {
   };
 
   const renderInstructions = (instructions) => {
-    return instructions.split("\r\n").map((step, index) => (
+    return instructions.split("\r\n").filter(Boolean).map((step, index) => (
       <View key={index} style={styles.instructionStep}>
         <Text style={styles.instructionStepText}>{`${index + 1}. ${step}`}</Text>
       </View>
     ));
   };
 
-  if (!recipeDetail) {
+  if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <Text>Loading...</Text>
+        <ActivityIndicator size="large" color="#FF6347" />
+        <Text style={styles.loadingText}>Loading recipe details...</Text>
+      </View>
+    );
+  }
+
+  if (!recipeDetail) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>No details available for this recipe.</Text>
       </View>
     );
   }
@@ -64,9 +88,9 @@ const RecipeDetail = ({ route, navigation }) => {
         <Text style={styles.recipeTitle}>{recipeDetail.strMeal}</Text>
 
         <View style={styles.detailsContainer}>
-          <Text style={styles.subtitle}>Cooking Time: {recipeDetail.strCookTime || 'N/A'}</Text>
-          <Text style={styles.subtitle}>Category: {recipeDetail.strCategory}</Text>
-          <Text style={styles.subtitle}>Cuisine: {recipeDetail.strArea}</Text>
+          <Text style={styles.subtitle}>Cooking Time: {recipeDetail.strCookTime || "N/A"}</Text>
+          <Text style={styles.subtitle}>Category: {recipeDetail.strCategory || "N/A"}</Text>
+          <Text style={styles.subtitle}>Cuisine: {recipeDetail.strArea || "N/A"}</Text>
 
           <Text style={styles.sectionTitle}>Ingredients</Text>
           {renderIngredients(recipeDetail).map((ingredient, index) => (
@@ -96,8 +120,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: wp("5%"),
-    marginTop:hp("5%"),
-    marginBottom: hp("3%"),
     backgroundColor: "#fff",
   },
   loadingContainer: {
@@ -105,16 +127,27 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  loadingText: {
+    marginTop: hp("2%"),
+    fontSize: wp("4%"),
+    color: "#555",
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  errorText: {
+    fontSize: wp("4.5%"),
+    color: "#FF6347",
+    fontWeight: "bold",
+  },
   recipeImage: {
     width: "100%",
     height: hp("40%"),
     borderRadius: wp("3%"),
     borderWidth: 2,
-    borderColor: "#ddd", // Adds a subtle border to the image
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
+    borderColor: "#ddd",
   },
   recipeTitle: {
     fontSize: wp("6.5%"),
@@ -137,7 +170,7 @@ const styles = StyleSheet.create({
     fontSize: wp("5%"),
     fontWeight: "bold",
     marginTop: hp("2%"),
-    color: "#FF6347", // A fresh color to highlight sections
+    color: "#FF6347",
   },
   ingredientText: {
     fontSize: wp("4.2%"),
@@ -166,7 +199,7 @@ const styles = StyleSheet.create({
   },
   videoLink: {
     marginTop: hp("3%"),
-    backgroundColor: "#FF6347", // Tomato color
+    backgroundColor: "#FF6347",
     paddingVertical: hp("1.5%"),
     borderRadius: wp("3%"),
     alignItems: "center",
@@ -183,7 +216,7 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flexGrow: 1,
-    paddingBottom: hp("3%"), // Adjust padding to ensure content isn't cut off at the bottom
+    paddingBottom: hp("3%"),
   },
 });
 

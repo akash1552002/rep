@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Image,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { UserCircleIcon } from "react-native-heroicons/outline";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
@@ -12,66 +19,46 @@ import { auth } from "../../firebaseConfig";
 const About = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  // const { userName } = route.params || {};
-  const { userName: paramUserName } = route.params || {}
-  //profile image
-  const { userName, profileImage } = route.params || {};
+  const { userName: paramUserName, profileImage } = route.params || {};
 
   const [selectedCategory, setSelectedCategory] = useState("");
   const [displayName, setDisplayName] = useState(paramUserName || "User");
 
+  // Fetch user details if not provided via route
   useEffect(() => {
     if (!paramUserName) {
       const currentUser = auth.currentUser;
       if (currentUser) {
         setDisplayName(currentUser.displayName || "User");
-      } else {
-        console.warn("No userName provided and no current user found.");
       }
     }
   }, [paramUserName]);
+
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar style="black" />
-      {/* Top Header Section */}
+      <StatusBar style="dark" />
+
+      {/* Header */}
       <View style={styles.header}>
-        {/* Circular Logo Section */}
-        <View style={styles.imageCircle}>
-          <Image
-            source={require("../../assets/file.png")} // Replace with your logo image
-            style={styles.circularLogo}
-          />
-        </View>
-
-        {/* <TouchableOpacity onPress={() => navigation.navigate("Profile", { userName })}> */}
-        {/* <TouchableOpacity onPress={() => navigation.navigate("Profile", { userName: displayName })}>
-
-          <UserCircleIcon size={hp("6%")} color="#000" />
-        </TouchableOpacity> */}
-        {/* Profile Image Section */}
         <TouchableOpacity
-        style={styles.profileImageContainer}
-        onPress={() => navigation.navigate("Profile", { userName, profileImage })}
-      >
-        {profileImage ? (
-          <Image source={{ uri: profileImage }} style={styles.profileImage} />
-        ) : (
-          <UserCircleIcon size={hp("6%")} color="#000" marginTop={hp("0%")}/> // Default profile icon
-        )}
-      </TouchableOpacity>
+          style={styles.profileImageContainer}
+          onPress={() => navigation.navigate("Profile", { userName: displayName, profileImage })}
+        >
+          {profileImage ? (
+            <Image source={{ uri: profileImage }} style={styles.profileImage} />
+          ) : (
+            <UserCircleIcon size={hp("6%")} color="#000" />
+          )}
+        </TouchableOpacity>
       </View>
 
-      {/* Greeting Section */}
+      {/* Greeting */}
       <View style={styles.greeting}>
-      {/* <Text style={styles.helloText}>Hello, {displayName}</Text> */}
-      <Text style={styles.helloText}>Hello, {displayName}</Text>
-
-        <Text style={styles.subtitleText}>
-          Make your own food, stay at home
-        </Text>
+        <Text style={styles.helloText}>Hello, {displayName}</Text>
+        <Text style={styles.subtitleText}>Make your own food, stay at home</Text>
       </View>
 
-      {/* Search Section */}
+      {/* Search Bar */}
       <View style={styles.searchSection}>
         <TextInput
           style={styles.searchInput}
@@ -79,13 +66,13 @@ const About = () => {
         />
       </View>
 
-      {/* Categories Section */}
+      {/* Categories */}
       <Catagories
         selectedCategory={selectedCategory}
         setSelectedCategory={setSelectedCategory}
       />
 
-      {/* Recipes Section */}
+      {/* Recipes */}
       <Recipe selectedCategory={selectedCategory} />
     </SafeAreaView>
   );
@@ -97,48 +84,30 @@ const styles = StyleSheet.create({
     backgroundColor: "#F9F9F9",
   },
   profileImageContainer: {
-    marginBottom: 20,
     alignItems: "center",
+    marginBottom: hp("2%"),
   },
   profileImage: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
+    width: hp("12%"),
+    height: hp("12%"),
+    borderRadius: hp("6%"),
     borderWidth: 2,
     borderColor: "#ddd",
   },
   header: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: wp("9%"),
-    paddingVertical: hp("1%"),
-  },
-  imageCircle: {
-    width: hp("6%"),
-    height: hp("6%"),
-    borderRadius: hp("3%"), // Makes the container a perfect circle
-    overflow: "hidden", // Ensures the logo stays within the circle
-    borderWidth: 2,
-    borderColor: "#ccc",
-    alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#fff", // Optional background
-    // marginTop:hp("1%")
-  },
-  circularLogo: {
-    width: "100%",
-    height: "100%",
-    resizeMode: "contain", // Ensures the logo is properly scaled inside the circle
+    alignItems: "center",
+    paddingVertical: hp("2%"),
   },
   greeting: {
-    marginTop: wp("5%"),
-    marginLeft: wp("7%"),
+    marginTop: hp("2%"),
+    marginLeft: wp("5%"),
   },
   helloText: {
-    fontSize: wp("5%"),
+    fontSize: wp("6%"),
     fontWeight: "bold",
-    color: "#000",
+    color: "#333",
   },
   subtitleText: {
     fontSize: wp("4%"),
@@ -158,6 +127,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingLeft: wp("3%"),
     fontSize: wp("4%"),
+    backgroundColor: "#FFF",
   },
 });
 
