@@ -44,5 +44,15 @@
     "@babel/core": "^7.20.0",
     "@babel/plugin-proposal-class-properties": "^7.18.6"
   },
-  "private": true
+  "private": true,
+  "expo": {
+    "doctor": {
+      "reactNativeDirectoryCheck": {
+        "exclude": [
+          "react-native-responsive-screen",
+          "react-native-heroicons"
+        ]
+      }
+    }
+  }
 }
