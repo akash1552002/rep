@@ -50,8 +50,12 @@
       "reactNativeDirectoryCheck": {
         "exclude": [
           "react-native-responsive-screen",
-          "react-native-heroicons"
-        ]
+          "react-native-heroicons",
+          "react-native-masonry-list",
+          "@react-native-seoul/masonry-list",
+          "react-router-native"
+        ],
+        "listUnknownPackages": false
       }
     }
   }
