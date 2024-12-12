@@ -36,13 +36,10 @@ const About = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* <StatusBar style="dark" /> */}
-      <View>
-        <h1 style={styles.col}>Hello</h1>
-      </View>
+      <StatusBar style="dark" />
 
       {/* Header */}
-      {/* <View style={styles.header}>
+      <View style={styles.header}>
         <TouchableOpacity
           style={styles.profileImageContainer}
           onPress={() => navigation.navigate("Profile", { userName: displayName, profileImage })}
@@ -53,38 +50,35 @@ const About = () => {
             <UserCircleIcon size={hp("6%")} color="#000" />
           )}
         </TouchableOpacity>
-      </View> */}
+      </View>
 
       {/* Greeting */}
-      {/* <View style={styles.greeting}>
+      <View style={styles.greeting}>
         <Text style={styles.helloText}>Hello, {displayName}</Text>
         <Text style={styles.subtitleText}>Make your own food, stay at home</Text>
-      </View> */}
+      </View>
 
       {/* Search Bar */}
-      {/* <View style={styles.searchSection}>
+      <View style={styles.searchSection}>
         <TextInput
           style={styles.searchInput}
           placeholder="Search for recipes or food..."
         />
-      </View> */}
+      </View>
 
       {/* Categories */}
-      {/* <Catagories
+      <Catagories
         selectedCategory={selectedCategory}
         setSelectedCategory={setSelectedCategory}
-      /> */}
+      />
 
       {/* Recipes */}
-      {/* <Recipe selectedCategory={selectedCategory} /> */}
+      <Recipe selectedCategory={selectedCategory} />
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  col: {
-    color: "black"
-  },
   safeArea: {
     flex: 1,
     backgroundColor: "#F9F9F9",
