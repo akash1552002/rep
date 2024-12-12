@@ -28,13 +28,12 @@ const LoginScreen = ({ navigation }) => {
       Alert.alert("Success", "Logged in successfully!");
 
       // Reset navigation stack to About screen after login
-      // navigation.dispatch(
-      //   CommonActions.reset({
-      //     index: 0,
-      //     routes: [{ name: "About", params: { userName } }],
-      //   })
-      // );
-      navigation.navigate("Home");
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{ name: "About", params: { userName } }],
+        })
+      );
     } catch (error) {
       Alert.alert("Error", error.message);
     } finally {
