@@ -34,7 +34,7 @@ interface SignupScreenProps {
   navigation: SignupScreenNavigationProp;
 }
 
-export default function Search({ navigation }: SignupScreenProps) {
+export default function SignUp({ navigation }: SignupScreenProps) {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [username, setUsername] = useState<string>("");
