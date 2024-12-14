@@ -1,15 +1,9 @@
-import { Text, View } from "react-native";
+import { NavigationProp } from "@react-navigation/native";
+import Login from "./login";
+interface Props {
+  navigation: NavigationProp<any>;
+}
 
-export default function Index() {
-  return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Text>Edit app/index.tsx to edit this screen.</Text>
-    </View>
-  );
+export default function Index({ navigation }: Props) {
+  return <Login navigation={navigation} />;
 }
