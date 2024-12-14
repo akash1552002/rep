@@ -1,33 +1,33 @@
 {
   "expo": {
-    "name": "Temporary App",
-    "slug": "temporary-apk",
+    "name": "rep",
+    "slug": "rep",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+    "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/adaptiveicon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.alexpandya.temporaryapk"
+      "package": "com.akashpr.rep"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "extra": {
       "eas": {
-        "projectId": "f23f1e4d-f3db-4f66-bed0-90681f0b83fd"
+        "projectId": "eea85f2f-7d1b-4167-a423-3625d5f671cb"
       }
     }
   }
