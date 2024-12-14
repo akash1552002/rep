@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -7,8 +8,11 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { CommonActions, NavigationProp } from "@react-navigation/native";
-import { useState } from "react";
+import {
+  CommonActions,
+  NavigationProp,
+  useNavigation,
+} from "@react-navigation/native";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebaseConfig";
 import {
@@ -16,14 +20,19 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 
-interface Props {
-  navigation: NavigationProp<any>;
-}
+// Define the navigation type for your app stack
+type RootStackParamList = {
+  Login: undefined;
+  SignUp: undefined;
+  About: { userName?: string };
+  // Add other screens here as needed
+};
 
-export default function Login({ navigation }: Props) {
+export default function Login() {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>(); // Type navigation
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false); // Loading state
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -91,7 +100,7 @@ export default function Login({ navigation }: Props) {
         <ActivityIndicator size="large" color="#FF6347" style={styles.loader} />
       )}
 
-      <Text style={styles.link} onPress={() => navigation.navigate("Signup")}>
+      <Text style={styles.link} onPress={() => navigation.navigate("SignUp")}>
         Don't have an account? Sign up
       </Text>
     </View>
@@ -112,7 +121,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderColor: "#ccc",
     fontSize: wp("4%"),
-    backgroundColor: "#FFF", // Added background color for the input
+    backgroundColor: "#FFF",
   },
   loader: {
     marginTop: hp("2%"),
