@@ -12,7 +12,6 @@ import Recipe from './src/components/Recipe';
 import Loader from './src/components/Loader';
 // import Detail from './src/Detail';
 
-
 const Stack = createNativeStackNavigator();
 
 export default function App() {

@@ -50,7 +50,7 @@ const Home = ({ navigation }) => {
 
     // Navigate based on login status after 4 seconds
     const timer = setTimeout(() => {
-      navigation.navigate("Loader", { isLoggedIn }); // Pass login status to Loader
+      navigation.navigate("About", { isLoggedIn }); // Pass login status to Loader
     }, 4000);
 
     return () => clearTimeout(timer); // Cleanup timer
