@@ -1,15 +1,20 @@
+
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View, Image, ScrollView, Linking, TouchableOpacity, SafeAreaView } from "react-native";
+import { StyleSheet, Text, View, Image, ScrollView, Linking, TouchableOpacity, SafeAreaView, Alert } from "react-native";
 import axios from "axios";
+import { Ionicons } from "@expo/vector-icons"; // Icon library for bookmarking
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
 
 const RecipeDetail = ({ route, navigation }) => {
   const { recipeId } = route.params;
   const [recipeDetail, setRecipeDetail] = useState(null);
+  const [isBookmarked, setIsBookmarked] = useState(false); // State for bookmarking
 
   useEffect(() => {
     if (recipeId) {
       fetchRecipeDetail();
+      checkIfBookmarked();
     }
   }, [recipeId]);
 
@@ -24,26 +29,39 @@ const RecipeDetail = ({ route, navigation }) => {
     }
   };
 
-  const renderIngredients = (recipe) => {
-    const ingredients = [];
-    for (let i = 1; i <= 20; i++) {
-      if (recipe[`strIngredient${i}`]) {
-        ingredients.push(
-          `${recipe[`strIngredient${i}`]} - ${recipe[`strMeasure${i}`]}`
-        );
-      } else {
-        break;
+  const checkIfBookmarked = async () => {
+    try {
+      const bookmarks = await AsyncStorage.getItem("bookmarks");
+      const bookmarkedRecipes = bookmarks ? JSON.parse(bookmarks) : [];
+      if (bookmarkedRecipes.includes(recipeId)) {
+        setIsBookmarked(true);
       }
+    } catch (error) {
+      console.error("Error checking bookmarks:", error);
     }
-    return ingredients;
   };
 
-  const renderInstructions = (instructions) => {
-    return instructions.split("\r\n").map((step, index) => (
-      <View key={index} style={styles.instructionStep}>
-        <Text style={styles.instructionStepText}>{`${index + 1}. ${step}`}</Text>
-      </View>
-    ));
+  const handleBookmark = async () => {
+    try {
+      const bookmarks = await AsyncStorage.getItem("bookmarks");
+      const bookmarkedRecipes = bookmarks ? JSON.parse(bookmarks) : [];
+
+      if (isBookmarked) {
+        // Remove from bookmarks
+        const updatedBookmarks = bookmarkedRecipes.filter(id => id !== recipeId);
+        await AsyncStorage.setItem("bookmarks", JSON.stringify(updatedBookmarks));
+        setIsBookmarked(false);
+        Alert.alert("Removed from Bookmarks", `Recipe "${recipeDetail.strMeal}" has been removed from your bookmarks.`);
+      } else {
+        // Add to bookmarks
+        bookmarkedRecipes.push(recipeId);
+        await AsyncStorage.setItem("bookmarks", JSON.stringify(bookmarkedRecipes));
+        setIsBookmarked(true);
+        Alert.alert("Added to Bookmarks", `Recipe "${recipeDetail.strMeal}" has been added to your bookmarks.`);
+      }
+    } catch (error) {
+      console.error("Error saving bookmark:", error);
+    }
   };
 
   if (!recipeDetail) {
@@ -86,17 +104,55 @@ const RecipeDetail = ({ route, navigation }) => {
               <Text style={styles.videoLinkText}>Watch Cooking Video</Text>
             </TouchableOpacity>
           )}
+
+          {/* Bookmark Button */}
+          <TouchableOpacity
+            style={styles.bookmarkButton}
+            onPress={handleBookmark}
+          >
+            <Ionicons
+              name={isBookmarked ? "bookmark" : "bookmark-outline"}
+              size={wp("8%")}
+              color={isBookmarked ? "#FF6347" : "#555"}
+            />
+            <Text style={styles.bookmarkButtonText}>
+              {isBookmarked ? "Bookmarked" : "Bookmark"}
+            </Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 };
 
+// Add the necessary render functions
+const renderIngredients = (recipe) => {
+  const ingredients = [];
+  for (let i = 1; i <= 20; i++) {
+    if (recipe[`strIngredient${i}`]) {
+      ingredients.push(
+        `${recipe[`strIngredient${i}`]} - ${recipe[`strMeasure${i}`]}`
+      );
+    } else {
+      break;
+    }
+  }
+  return ingredients;
+};
+
+const renderInstructions = (instructions) => {
+  return instructions.split("\r\n").map((step, index) => (
+    <View key={index} style={styles.instructionStep}>
+      <Text style={styles.instructionStepText}>{`${index + 1}. ${step}`}</Text>
+    </View>
+  ));
+};
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: wp("5%"),
-    marginTop:hp("5%"),
+    marginTop: hp("5%"),
     marginBottom: hp("3%"),
     backgroundColor: "#fff",
   },
@@ -110,7 +166,7 @@ const styles = StyleSheet.create({
     height: hp("40%"),
     borderRadius: wp("3%"),
     borderWidth: 2,
-    borderColor: "#ddd", // Adds a subtle border to the image
+    borderColor: "#ddd",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
@@ -137,7 +193,7 @@ const styles = StyleSheet.create({
     fontSize: wp("5%"),
     fontWeight: "bold",
     marginTop: hp("2%"),
-    color: "#FF6347", // A fresh color to highlight sections
+    color: "#FF6347",
   },
   ingredientText: {
     fontSize: wp("4.2%"),
@@ -166,7 +222,7 @@ const styles = StyleSheet.create({
   },
   videoLink: {
     marginTop: hp("3%"),
-    backgroundColor: "#FF6347", // Tomato color
+    backgroundColor: "#FF6347",
     paddingVertical: hp("1.5%"),
     borderRadius: wp("3%"),
     alignItems: "center",
@@ -183,7 +239,29 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flexGrow: 1,
-    paddingBottom: hp("3%"), // Adjust padding to ensure content isn't cut off at the bottom
+    paddingBottom: hp("3%"),
+  },
+  bookmarkButton: {
+    marginTop: hp("2%"),
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#fff",
+    borderRadius: wp("3%"),
+    borderWidth: 1,
+    borderColor: "#FF6347",
+    paddingVertical: hp("1.5%"),
+    paddingHorizontal: wp("8%"),
+    shadowColor: "#FF6347",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+  },
+  bookmarkButtonText: {
+    fontSize: wp("4.5%"),
+    color: "#FF6347",
+    fontWeight: "bold",
+    marginLeft: wp("2%"),
   },
 });
 

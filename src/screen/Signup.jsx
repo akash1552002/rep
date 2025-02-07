@@ -1,3 +1,6 @@
+
+
+//imp
 import React, { useState } from "react";
 import {
   View,
@@ -9,6 +12,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  ActivityIndicator
 } from "react-native";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from "../../firebaseConfig";
@@ -18,8 +22,22 @@ export default function SignupScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState(""); // New state for username
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSignup = async () => {
+    if (!username || !email || !password) {
+      Alert.alert("Error", "Please fill out all fields.");
+      return;
+    }
+
+    if (password.length < 6) {
+      Alert.alert("Error", "Password must be at least 6 characters long.");
+      return;
+    }
+
+    setLoading(true); // Show loading spinner
+
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
@@ -30,14 +48,18 @@ export default function SignupScreen({ navigation }) {
       });
   
       Alert.alert("Success", "Account created!");
-  
-      // Pass the username to the About component
       navigation.navigate("About", { userName: username });
     } catch (error) {
       Alert.alert("Error", error.message);
+    } finally {
+      setLoading(false); // Hide loading spinner
     }
   };
-  
+
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
+  };
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -68,13 +90,20 @@ export default function SignupScreen({ navigation }) {
           placeholder="Password"
           value={password}
           onChangeText={setPassword}
-          secureTextEntry
+          secureTextEntry={!showPassword}
           placeholderTextColor="#aaa"
         />
-
-        <TouchableOpacity style={styles.button} onPress={handleSignup}>
-          <Text style={styles.buttonText}>Sign Up</Text>
+        <TouchableOpacity onPress={togglePasswordVisibility}>
+          <Text style={styles.passwordVisibility}>Show/Hide Password</Text>
         </TouchableOpacity>
+
+        {loading ? (
+          <ActivityIndicator size="large" color="#007BFF" />
+        ) : (
+          <TouchableOpacity style={styles.button} onPress={handleSignup}>
+            <Text style={styles.buttonText}>Sign Up</Text>
+          </TouchableOpacity>
+        )}
 
         <Text style={styles.link}>
           Already have an account?{" "}
@@ -145,4 +174,10 @@ const styles = StyleSheet.create({
     color: "#007BFF",
     fontWeight: "bold",
   },
+  passwordVisibility: {
+    color: "#007BFF",
+    fontSize: wp("3%"),
+    marginTop: hp("1%"),
+    textAlign: "center",
+  }
 });

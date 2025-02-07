@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Image, StyleSheet } from "react-native";
+import { View, Image, StyleSheet, Alert } from "react-native";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -10,7 +10,6 @@ import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { StatusBar } from "expo-status-bar";
 import { auth } from "../../firebaseConfig"; // Firebase configuration
 import logo from "../../assets/logo.png"; // Replace with your logo
-// import { onAuthStateChanged } from "firebase/auth";
 
 const Home = ({ navigation }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(null); // Track login status
@@ -50,11 +49,15 @@ const Home = ({ navigation }) => {
 
     // Navigate based on login status after 4 seconds
     const timer = setTimeout(() => {
-      navigation.navigate("Loader", { isLoggedIn }); // Pass login status to Loader
+      if (isLoggedIn) {
+        navigation.navigate("About"); // Navigate to Profile if logged in
+      } else {
+        navigation.navigate("Login"); // Navigate to Login if not logged in
+      }
     }, 4000);
 
     return () => clearTimeout(timer); // Cleanup timer
-  }, [isLoggedIn]);
+  }, [isLoggedIn, navigation]);
 
   // Animated styles for the bouncing logo
   const animatedImageStyle = useAnimatedStyle(() => ({
